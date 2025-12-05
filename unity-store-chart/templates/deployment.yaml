@@ -1,0 +1,73 @@
+
+{{- $secretNamePrefix := include "unity-store.name" . }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "unity-store.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "unity-store.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.microservice.replicas }} 
+  selector:
+    matchLabels:
+      {{- include "unity-store.selectorLabels" . | nindent 6 }}  
+  template:
+    metadata:
+      {{- if include "unity-store.deployment.annotations" . }}
+      annotations:
+        {{- include "unity-store.deployment.annotations" . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "unity-store.selectorLabels" . | nindent 8 }}  
+    spec:
+      serviceAccountName: {{ include "unity-store.name" . }}
+      containers:
+        - name: {{ include "unity-store.name" . }}  
+          image: "{{ .Values.imagePath }}:{{ .Values.microservice.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          env:
+          - name: ENVIRONMENT
+            value: {{ .Values.microservice.environment | lower }}
+          - name: MICROSERVICE
+            value: {{ .Values.microservice.name }}
+          - name: LOG_LEVEL
+            value: {{ .Values.microservice.logLevel }}
+          - name: PORT
+            value: {{ .Values.microservice.port | quote }}
+          ports:
+            - name: {{ .Values.microservice.protocol }}
+              containerPort: {{ .Values.microservice.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.microservice.healthCheckPath }}
+              port: {{ .Values.microservice.protocol }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.microservice.healthCheckPath }}
+              port: {{ .Values.microservice.protocol }}
+          resources:
+            limits:
+              memory: {{ .Values.resources.memory }}
+              cpu: {{ .Values.resources.cpu }}
+            requests:
+              memory: {{ .Values.resources.memory }}
+              cpu: {{ .Values.resources.cpu }}
+          {{- if .Values.secrets }}
+          volumeMounts:
+          {{- range .Values.secrets }}
+          - name: {{ $secretNamePrefix }}-{{ .name }}
+            readOnly: true
+            mountPath: {{ .mountPath }}
+            subPath: {{ .subPath }}
+          {{- end }}
+          {{- end }}
+      {{- if .Values.secrets }}
+      volumes:
+      {{- range .Values.secrets }}
+      - name: {{ $secretNamePrefix }}-{{ .name }}
+        secret:
+          secretName: {{ .name }}
+      {{- end }}
+      {{- end }} 

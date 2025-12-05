@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "unity-store.name" . }}-test-connection"
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "unity-store.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "unity-store.name" . }}:{{ .Values.microservice.port }}']
+  restartPolicy: Never

@@ -1,0 +1,30 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "unity-store.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "unity-store.labels" . | nindent 4 }}
+  annotations:
+    {{- include "unity-store.ingress.annotations" . | nindent 4 }}
+spec:
+  ingressClassName: {{ include "unity-store.ingressClassName" . }}
+  {{- if .Values.ingress.protocol | eq "https" }}
+  tls:
+    - hosts:
+      - "{{ .Values.ingress.host }}"
+      secretName: "tls-{{- include "unity-store.name" . }}"
+  {{- end }}
+  rules:
+  - host: "{{ .Values.ingress.host }}"
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "unity-store.name" . }}
+              port:
+                number: {{ .Values.microservice.port }}
+{{- end }}

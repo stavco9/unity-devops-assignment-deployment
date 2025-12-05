@@ -1,0 +1,28 @@
+# Global variables
+microservice:
+  name: management-api
+  tag: 1.0.0
+  environment: dev
+  port: 3000
+  healthCheckPath: /health
+  logLevel: INFO
+  protocol: http
+  replicas: 1
+
+# Image variables
+imagePath: ghcr.io/stavco9/unity-devops-assignment-app/management-api
+
+# If enableing ingress, the external URL will be https://{{ microservice.name }}-{{ microservice.environment }}.k8s.stavco9.com
+ingress:
+  enabled: false
+
+secrets:
+- name: management-api-conf
+  mountPath: /app/config/config-dev.json
+  subPath: config-dev.json
+- name: kafka-consumer-properties
+  mountPath: /app/config/kafka-dev.properties
+  subPath: kafka-dev.properties
+
+irsa:
+  enabled: true

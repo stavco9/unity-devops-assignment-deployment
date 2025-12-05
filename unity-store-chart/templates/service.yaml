@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "unity-store.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "unity-store.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.microservice.port }}
+      targetPort: {{ .Values.microservice.port }}
+      protocol: TCP
+      name: {{ .Values.microservice.protocol }}
+  selector:
+    {{- include "unity-store.selectorLabels" . | nindent 4 }}  

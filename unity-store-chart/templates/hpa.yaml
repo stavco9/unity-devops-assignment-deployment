@@ -1,0 +1,39 @@
+{{- if .Values.autoscaling.enabled -}}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "flask-hello-world.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "flask-hello-world.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "flask-hello-world.name" . }}
+  minReplicas: {{ .Values.autoscaling.minPods }}
+  maxReplicas: {{ .Values.autoscaling.maxPods }}
+  metrics:
+    {{- if .Values.autoscaling.cpu.enabled }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.cpu.percentage }}
+    {{- end }}
+    {{- if .Values.autoscaling.memory.enabled }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.memory.percentage }}
+    {{- end }}
+    {{- range $v := .Values.autoscaling.customMetrics }}
+    - type: Pods
+      pods:
+        metricName: {{ $v.name }}
+        targetAverageValue: {{ $v.threshold }}
+    {{- end }}
+{{- end }}

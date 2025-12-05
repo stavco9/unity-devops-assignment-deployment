@@ -1,0 +1,6 @@
+1. Get the application internal URL:
+ http://{{ .Values.microservice.name }}.{{ .Release.Namespace }}.svc:{{ .Values.microservice.port }}
+2. Get the application external URL:
+{{- if .Values.ingress.enabled }}
+ https://{{ .Values.microservice.name }}-{{ .Values.microservice.environment }}.k8s.stavco9.com
+{{- end }}

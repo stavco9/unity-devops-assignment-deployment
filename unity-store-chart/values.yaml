@@ -1,0 +1,52 @@
+# Global variables
+microservice:
+  name: unity-store
+  tag: latest
+  environment: dev
+  port: 3000
+  healthCheckPath: /health
+  logLevel: INFO
+  protocol: http
+  replicas: 1
+
+resources:
+  memory: 512Mi
+  cpu: 200m
+
+autoscaling:
+  enabled: false
+  minPods: 1
+  maxPods: 10
+  cpu:
+    enabled: false
+    percentage: 90
+  memory:
+    enabled: false
+    percentage: 70
+  customMetrics: []
+  ###
+  ### customMetrics:
+  ### - name: sessions_counter
+  ###   threshold: 2
+  ###
+
+prometheusMetrics:
+  enabled: false
+
+# Image variables
+imagePath: ghcr.io/stavco9/unity-devops-assignment-app/web-server
+
+# If enableing ingress, the external URL will be https://{{ microservice.name }}-{{ microservice.environment }}.k8s.stavco9.com
+ingress:
+  enabled: true
+  protocol: https
+  ingressClassName: nginx
+  host: unity-store.example.com
+
+# If not specifying iamRoleArn, a new IAM Role will be created with the following values.
+irsa:
+  enabled: false
+  awsAccountId: "882709358319"
+  oidcProviderName: "882709358319-eu-central-1-stav-devops-irsa-discovery-pre-prod.s3.eu-central-1.amazonaws.com"
+  awsRegion: eu-central-1
+  iamRoleArn:

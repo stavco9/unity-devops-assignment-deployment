@@ -1,0 +1,29 @@
+{{ if and .Values.irsa.enabled (not .Values.irsa.iamRoleArn) }}
+apiVersion: iam.services.k8s.aws/v1alpha1
+kind: Role
+metadata:
+  name: {{ include "unity-store.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "unity-store.labels" . | nindent 4 }}
+spec:
+  name: {{ include "unity-store.iamRoleName" . }}
+  assumeRolePolicyDocument: |
+    {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Effect": "Allow",
+              "Principal": {
+                  "Federated": "arn:aws:iam::{{ .Values.irsa.awsAccountId }}:oidc-provider/{{ .Values.irsa.oidcProviderName }}"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                  "StringEquals": {
+                      "{{ .Values.irsa.oidcProviderName }}:sub": "system:serviceaccount:{{ .Release.Namespace }}:{{ include "unity-store.name" . }}"
+                  }
+              }
+          }
+      ]
+    }
+{{- end }}
