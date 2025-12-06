@@ -16,6 +16,9 @@ imagePath: ghcr.io/stavco9/unity-devops-assignment-app/management-api
 ingress:
   enabled: false
 
+# Need to pre-create the secrets in kubernetes cluster.
+# e.g. kubectl create secret generic management-api-conf --from-file=config-dev.json --namespace unity-store-dev
+# kubectl create secret generic kafka-consumer-properties --from-file=kafka-dev.properties --namespace unity-store-dev
 secrets:
 - name: management-api-conf
   mountPath: /app/config/config-dev.json

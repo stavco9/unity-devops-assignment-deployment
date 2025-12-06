@@ -19,6 +19,9 @@ ingress:
   ingressClassName: nginx
   host: unity-store-dev-web-server.k8s.stav-devops.eu-central-1.pre-prod.stavco9.com
 
+# Need to pre-create the secrets in kubernetes cluster.
+# e.g. kubectl create secret generic web-server-conf --from-file=config-dev.json --namespace unity-store-dev
+# kubectl create secret generic kafka-producer-properties --from-file=kafka-dev.properties --namespace unity-store-dev
 secrets:
 - name: web-server-conf
   mountPath: /app/config/config-dev.json
