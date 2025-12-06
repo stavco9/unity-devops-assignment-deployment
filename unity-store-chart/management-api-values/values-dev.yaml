@@ -1,7 +1,7 @@
 # Global variables
 microservice:
   name: management-api
-  tag: 1.0.0
+  tag: 1.0.1
   environment: dev
   port: 3000
   healthCheckPath: /health
