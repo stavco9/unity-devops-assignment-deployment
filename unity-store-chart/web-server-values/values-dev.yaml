@@ -34,3 +34,14 @@ secrets:
 # IAM Role variables
 irsa:
   enabled: true
+
+autoscaling:
+  enabled: true
+  minPods: 1
+  maxPods: 5
+  http:
+    enabled: true
+    scaledownPeriod: 60 # in seconds
+    targetRequestRate: 10 # number of requests
+    requestRateGranularity: 1s
+    requestRateWindow: 10s

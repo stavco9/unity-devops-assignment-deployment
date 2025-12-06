@@ -23,6 +23,12 @@ autoscaling:
   memory:
     enabled: false
     percentage: 70
+  http:
+    enabled: false
+    scaledownPeriod: 300 # in seconds
+    targetRequestRate: 100 # number of requests
+    requestRateGranularity: 1s
+    requestRateWindow: 1m
   kafka:
     enabled: false
     pollingInterval: 5

@@ -8,7 +8,9 @@ metadata:
   labels:
     {{- include "unity-store.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.microservice.replicas }} 
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.microservice.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "unity-store.selectorLabels" . | nindent 6 }}  

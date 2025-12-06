@@ -1,0 +1,34 @@
+{{- if and .Values.autoscaling.enabled .Values.autoscaling.http.enabled }}
+kind: HTTPScaledObject
+apiVersion: http.keda.sh/v1alpha1
+metadata:
+  name: {{ include "unity-store.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "unity-store.labels" . | nindent 4 }}
+  annotations:
+    httpscaledobject.keda.sh/skip-scaledobject-creation: "false"
+spec:
+    hosts:
+    - {{ include "unity-store.name" . }}
+    - {{ include "unity-store.name" . }}.{{ .Release.Namespace }}.svc
+    - {{ include "unity-store.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+    {{- if .Values.ingress.enabled }}
+    - {{ .Values.ingress.host }}
+    {{- end }}
+    scaleTargetRef:
+        name: {{ include "unity-store.name" . }}
+        kind: Deployment
+        apiVersion: apps/v1
+        service: {{ include "unity-store.name" . }}
+        port: {{ .Values.microservice.port }}
+    replicas:
+        min: {{ .Values.autoscaling.minPods }}
+        max: {{ .Values.autoscaling.maxPods }}
+    scaledownPeriod: {{ .Values.autoscaling.http.scaledownPeriod }}
+    scalingMetric: # requestRate and concurrency are mutually exclusive
+      requestRate:
+        granularity: {{ .Values.autoscaling.http.requestRateGranularity }}
+        targetValue: {{ .Values.autoscaling.http.targetRequestRate }}
+        window: {{ .Values.autoscaling.http.requesRateWindow }}
+{{- end }}
