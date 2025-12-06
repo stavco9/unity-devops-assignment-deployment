@@ -12,13 +12,14 @@ microservice:
 # Image variables
 imagePath: ghcr.io/stavco9/unity-devops-assignment-app/web-server
 
-# If enableing ingress, the external URL will be https://{{ microservice.name }}-{{ microservice.environment }}.k8s.stavco9.com
+# Ingress variables
 ingress:
   enabled: true
   protocol: https
   ingressClassName: nginx
   host: unity-store-dev-web-server.k8s.stav-devops.eu-central-1.pre-prod.stavco9.com
 
+# Secrets variables
 # Need to pre-create the secrets in kubernetes cluster.
 # e.g. kubectl create secret generic web-server-conf --from-file=config-dev.json --namespace unity-store-dev
 # kubectl create secret generic kafka-producer-properties --from-file=kafka-dev.properties --namespace unity-store-dev
@@ -30,5 +31,6 @@ secrets:
   mountPath: /app/config/kafka-dev.properties
   subPath: kafka-dev.properties
 
+# IAM Role variables
 irsa:
   enabled: true

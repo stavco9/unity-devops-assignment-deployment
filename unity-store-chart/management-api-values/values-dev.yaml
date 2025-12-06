@@ -12,10 +12,11 @@ microservice:
 # Image variables
 imagePath: ghcr.io/stavco9/unity-devops-assignment-app/management-api
 
-# If enableing ingress, the external URL will be https://{{ microservice.name }}-{{ microservice.environment }}.k8s.stavco9.com
+# Ingress variables
 ingress:
   enabled: false
 
+# Secrets variables
 # Need to pre-create the secrets in kubernetes cluster.
 # e.g. kubectl create secret generic management-api-conf --from-file=config-dev.json --namespace unity-store-dev
 # kubectl create secret generic kafka-consumer-properties --from-file=kafka-dev.properties --namespace unity-store-dev
@@ -27,5 +28,22 @@ secrets:
   mountPath: /app/config/kafka-dev.properties
   subPath: kafka-dev.properties
 
+# IAM Role variables
 irsa:
   enabled: true
+
+autoscaling:
+  enabled: true
+  minPods: 1
+  maxPods: 6 # The number of partitions in the topic
+  kafka:
+    enabled: true
+    pollingInterval: 5
+    consumerGroup: management-api-consumer-group
+    bootstrapServers: pkc-921jm.us-east-2.aws.confluent.cloud:9092
+    topic: unity-store-dev
+    lagThreshold: 5
+    offsetRestPolicy: earliest
+    sasl: plaintext
+    tls: enable
+    credentialsSecretName: unity-store-dev-kafka-credentials

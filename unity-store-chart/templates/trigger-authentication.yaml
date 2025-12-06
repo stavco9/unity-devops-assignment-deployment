@@ -1,0 +1,20 @@
+{{ if and .Values.autoscaling.enabled .Values.autoscaling.kafka.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: {{ include "unity-store.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "unity-store.labels" . | nindent 4 }}
+spec:
+  secretTargetRef:
+    - parameter: authMode
+      name: {{ .Values.autoscaling.kafka.credentialsSecretName }}
+      key: authMode
+    - parameter: username
+      name: {{ .Values.autoscaling.kafka.credentialsSecretName }}
+      key: username
+    - parameter: password
+      name: {{ .Values.autoscaling.kafka.credentialsSecretName }}
+      key: password
+{{- end }}

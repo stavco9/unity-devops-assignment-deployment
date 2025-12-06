@@ -1,0 +1,27 @@
+{{ if and .Values.autoscaling.enabled .Values.autoscaling.kafka.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "unity-store.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "unity-store.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    name: {{ include "unity-store.name" . }}
+  pollingInterval: {{ .Values.autoscaling.kafka.pollingInterval }}
+  minReplicaCount: {{ .Values.autoscaling.minPods }}
+  maxReplicaCount: {{ .Values.autoscaling.maxPods }} # Max can go upto num of partitions you have in the topic
+  triggers:
+    - type: kafka
+      metadata:
+        consumerGroup: {{ .Values.autoscaling.kafka.consumerGroup }}
+        bootstrapServers: {{ .Values.autoscaling.kafka.bootstrapServers }}
+        topic: {{ .Values.autoscaling.kafka.topic }}
+        lagThreshold: {{ .Values.autoscaling.kafka.lagThreshold | quote }}
+        offsetRestPolicy: {{ .Values.autoscaling.kafka.offsetRestPolicy }}
+        sasl: {{ .Values.autoscaling.kafka.sasl }}
+        tls: {{ .Values.autoscaling.kafka.tls | default "disable" }}
+      authenticationRef:
+        name: {{ include "unity-store.name" . }}
+{{- end }}

@@ -23,6 +23,27 @@ autoscaling:
   memory:
     enabled: false
     percentage: 70
+  kafka:
+    enabled: false
+    pollingInterval: 5
+    consumerGroup: 
+    bootstrapServers:
+    topic:
+    lagThreshold: "10"
+    offsetRestPolicy: latest
+    sasl: plaintext
+    tls: enable
+    credentialsSecretName:
+    # This secret should be pre-created in the kubernetes cluster.
+    # apiVersion: v1
+    #  kind: Secret
+    #  metadata:
+    #    name: <your-secret-name>
+    #    namespace: <your-namespace>
+    #  data:
+    #    authMode: "sasl_ssl_plain"
+    #    username: <your username>
+    #    password: <your password>
   customMetrics: []
   ###
   ### customMetrics:
@@ -30,18 +51,25 @@ autoscaling:
   ###   threshold: 2
   ###
 
-prometheusMetrics:
-  enabled: false
-
 # Image variables
 imagePath: ghcr.io/stavco9/unity-devops-assignment-app/web-server
 
-# If enableing ingress, the external URL will be https://{{ microservice.name }}-{{ microservice.environment }}.k8s.stavco9.com
+# Ingress variables
 ingress:
   enabled: true
   protocol: https
   ingressClassName: nginx
   host: unity-store.example.com
+
+# Secrets variables
+# Need to pre-create the secrets in kubernetes cluster.
+# e.g. kubectl create secret generic web-server-conf --from-file=config-dev.json --namespace unity-store-dev
+# kubectl create secret generic kafka-producer-properties --from-file=kafka-dev.properties --namespace unity-store-dev
+# The object structure is:
+# - name: <secret-name>
+#   mountPath: <mount-path>
+#   subPath: <sub-path>
+secrets: []
 
 # If not specifying iamRoleArn, a new IAM Role will be created with the following values.
 irsa:

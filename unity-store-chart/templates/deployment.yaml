@@ -14,10 +14,6 @@ spec:
       {{- include "unity-store.selectorLabels" . | nindent 6 }}  
   template:
     metadata:
-      {{- if include "unity-store.deployment.annotations" . }}
-      annotations:
-        {{- include "unity-store.deployment.annotations" . | nindent 8 }}
-      {{- end }}
       labels:
         {{- include "unity-store.selectorLabels" . | nindent 8 }}  
     spec:

@@ -42,18 +42,6 @@ environment: {{ .Values.microservice.environment }}
 {{- end }}
 
 {{/*
-Deployment annotations
-*/}}
-{{- define "unity-store.deployment.annotations" -}}
-{{- if .Values.prometheusMetrics.enabled }}
-prometheus.io/path: "/metrics"
-prometheus.io/scheme: "{{ .Values.microservice.protocol }}"
-prometheus.io/scrape: "true"
-prometheus.io/port: "{{ .Values.microservice.port }}"
-{{- end }}
-{{- end }}
-
-{{/*
 Ingress annotations
 */}}
 {{- define "unity-store.ingress.annotations" -}}
