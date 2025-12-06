@@ -42,9 +42,33 @@ environment: {{ .Values.microservice.environment }}
 {{- end }}
 
 {{/*
+Ingress object name
+*/}}
+{{- define "unity-store.ingress.name" -}}
+{{- if .Values.autoscaling.http.enabled -}}
+{{- printf "%s-%s-keda" .Release.Namespace (include "unity-store.name" .) -}}
+{{- else }}
+{{- include "unity-store.name" . -}}
+{{- end }}
+{{- end }}
+
+{{/*
+Ingress object namespace
+*/}}
+{{- define "unity-store.ingress.namespace" -}}
+{{- if .Values.autoscaling.http.enabled }}
+{{- printf "%s" .Values.autoscaling.http.kedaNamespace | default "keda" }}
+{{- else }}
+{{- printf "%s" .Release.Namespace }}
+{{- end }}
+{{- end }}
+
+{{/*
 Ingress annotations
 */}}
 {{- define "unity-store.ingress.annotations" -}}
+
+external-dns.alpha.kubernetes.io/hostname: {{ .Values.ingress.host }}
 
 {{/*
 Use Let's Encrypt ACME for any Ingress Controller which is no AWS ALB (Since in ALB we use the AWS ACM Certificate)
@@ -71,11 +95,6 @@ alb.ingress.kubernetes.io/ssl-redirect: '443'
 alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
 {{- end }}
 {{- end }}
-
-{{/*
-Add the host in the external DNS Annotation in order to create a DNS Record in the Cloud Provider
-*/}}
-external-dns.alpha.kubernetes.io/hostname: {{ .Values.ingress.host }}
 
 {{- define "unity-store.ingressClassName" -}}
 {{- default "nginx" .Values.ingress.ingressClassName }}

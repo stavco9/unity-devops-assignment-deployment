@@ -2,8 +2,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "unity-store.name" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "unity-store.ingress.name" . }}
+  namespace: {{ include "unity-store.ingress.namespace" . }}
   labels:
     {{- include "unity-store.labels" . | nindent 4 }}
   annotations:
@@ -14,7 +14,7 @@ spec:
   tls:
     - hosts:
       - "{{ .Values.ingress.host }}"
-      secretName: "tls-{{- include "unity-store.name" . }}"
+      secretName: "tls-{{- include "unity-store.ingress.name" . }}"
   {{- end }}
   rules:
   - host: "{{ .Values.ingress.host }}"
@@ -24,7 +24,13 @@ spec:
           pathType: Prefix
           backend:
             service:
+              {{- if not .Values.autoscaling.http.enabled }}
               name: {{ include "unity-store.name" . }}
               port:
                 number: {{ .Values.microservice.port }}
+              {{- else }}
+              name: keda-add-ons-http-interceptor-proxy
+              port:
+                number: 8080
+              {{- end }}
 {{- end }}

@@ -41,7 +41,8 @@ autoscaling:
   maxPods: 5
   http:
     enabled: true
-    scaledownPeriod: 60 # in seconds
-    targetRequestRate: 10 # number of requests
+    scaledownPeriod: 20 # in seconds
+    targetRequestRate: 2 # number of requests
     requestRateGranularity: 1s
     requestRateWindow: 10s
+    kedaNamespace: keda

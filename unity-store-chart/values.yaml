@@ -29,6 +29,7 @@ autoscaling:
     targetRequestRate: 100 # number of requests
     requestRateGranularity: 1s
     requestRateWindow: 1m
+    kedaNamespace: keda
   kafka:
     enabled: false
     pollingInterval: 5

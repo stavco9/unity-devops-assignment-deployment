@@ -10,12 +10,9 @@ metadata:
     httpscaledobject.keda.sh/skip-scaledobject-creation: "false"
 spec:
     hosts:
-    - {{ include "unity-store.name" . }}
-    - {{ include "unity-store.name" . }}.{{ .Release.Namespace }}.svc
-    - {{ include "unity-store.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
-    {{- if .Values.ingress.enabled }}
     - {{ .Values.ingress.host }}
-    {{- end }}
+    pathPrefixes:
+    - {{ .Values.autoscaling.http.pathPrefix | default "/" }}
     scaleTargetRef:
         name: {{ include "unity-store.name" . }}
         kind: Deployment
